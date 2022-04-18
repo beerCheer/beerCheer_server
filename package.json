@@ -1,0 +1,45 @@
+{
+  "name": "beercheer_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon bin/server.js",
+    "test": "NODE_ENV=test mocha",
+    "commit": "cz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beerCheer/beerCheer_server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beerCheer/beerCheer_server/issues"
+  },
+  "homepage": "https://github.com/beerCheer/beerCheer_server#readme",
+  "devDependencies": {
+    "cz-conventional-changelog": "^3.3.0",
+    "mocha": "^9.2.2",
+    "nodemon": "^2.0.15",
+    "sequelize-cli": "^6.4.1",
+    "should": "^13.2.3",
+    "supertest": "^6.2.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.19.0"
+  }
+}

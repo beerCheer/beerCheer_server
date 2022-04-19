@@ -6,6 +6,7 @@ const development = {
   host: "127.0.0.1",
   dialect: "mysql",
   logging: false,
+  timezone: "+09:00",
 };
 const test = {
   username: process.env.TEST_DB_USERNAME,
@@ -14,6 +15,7 @@ const test = {
   host: "127.0.0.1",
   dialect: "mysql",
   logging: false,
+  timezone: "Asia/Seoul",
 };
 const production = {
   username: process.env.PRODUCT_DB_USERNAME,
@@ -22,6 +24,7 @@ const production = {
   host: "127.0.0.1",
   dialect: "mysql",
   logging: false,
+  timezone: "Asia/Seoul",
 };
 
 module.exports = {

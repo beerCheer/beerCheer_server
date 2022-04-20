@@ -3,7 +3,7 @@ const development = {
   username: process.env.DEV_DB_USERNAME,
   password: process.env.DEV_DB_PASSWORD,
   database: process.env.DEV_DB_NAME,
-  host: "127.0.0.1",
+  host: process.env.DEV_DB_HOST,
   dialect: "mysql",
   logging: false,
   timezone: "+09:00",
@@ -12,19 +12,19 @@ const test = {
   username: process.env.TEST_DB_USERNAME,
   password: process.env.TEST_DB_PASSWORD,
   database: process.env.TEST_DB_NAME,
-  host: "127.0.0.1",
+  host: process.env.TEST_DB_HOST,
   dialect: "mysql",
   logging: false,
-  timezone: "Asia/Seoul",
+  timezone: "+09:00",
 };
 const production = {
   username: process.env.PRODUCT_DB_USERNAME,
   password: process.env.PRODUCT_DB_PASSWORD,
   database: process.env.PRODUCT_DB_NAME,
-  host: "127.0.0.1",
+  host: process.env.PRODUCT_DB_NAME,
   dialect: "mysql",
   logging: false,
-  timezone: "Asia/Seoul",
+  timezone: "+09:00",
 };
 
 module.exports = {

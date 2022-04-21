@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "NODE_ENV=test mocha api/user/user.spec.js -w",
     "start": "nodemon bin/server.js",
-    "test": "NODE_ENV=test mocha",
     "commit": "cz"
   },
   "repository": {

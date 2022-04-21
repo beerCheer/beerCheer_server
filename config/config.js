@@ -16,6 +16,12 @@ const test = {
   dialect: "mysql",
   logging: false,
   timezone: "+09:00",
+  pool: {
+    max: 100,
+    min: 0,
+    idle: 200000,
+    acquire: 1000000,
+  },
 };
 const production = {
   username: process.env.PRODUCT_DB_USERNAME,

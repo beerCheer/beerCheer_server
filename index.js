@@ -9,6 +9,7 @@ const favoriteRouter = require("./api/favorite");
 const beerRouter = require("./api/beer");
 const signUp = require("./api/middlewares/signUp");
 const OAuthHandler = require("./api/middlewares/OAuthHandler");
+const isLoggedIn = require("./api/middlewares/isLoggedIn");
 
 require("dotenv").config();
 
@@ -27,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.post("/oauth", signUp, OAuthHandler);
-app.use("/users", userRouter);
+app.use("/users", isLoggedIn, userRouter);
 app.use("/beers", beerRouter);
 app.use("/preferences", preferenceRouter);
 app.use("/favorites", favoriteRouter);

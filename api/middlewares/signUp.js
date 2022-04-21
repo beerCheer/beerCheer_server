@@ -13,7 +13,6 @@ const signUp = async (req, res, next) => {
     },
   })
     .then(([user, created]) => {
-      delete user.dataValues.id;
       delete user.dataValues.email;
       delete user.dataValues.isPreferenceOrRateChecked;
       delete user.dataValues.isAdmin;

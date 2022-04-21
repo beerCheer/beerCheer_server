@@ -4,7 +4,6 @@ const cookieParser = require("cookie-parser");
 const request = require("supertest");
 const app = require("../../index");
 const models = require("../../models/index");
-const req = require("express/lib/request");
 
 describe("Set up Database", () => {
   const users = [

@@ -28,11 +28,8 @@ const getTwelveBeersById = async (numArr, next) => {
 
   try {
     const beers = await axios.get(punkUrl);
-    return new Promise((resolve, reject) => {
-      if (err) {
-        reject("hello");
-      }
-      resolve(beers);
+    return new Promise((resolve) => {
+      resolve(beers.data);
     });
   } catch (err) {
     console.log(err);

@@ -29,6 +29,7 @@ app.use(cookieParser());
 
 app.post("/oauth", signUp, OAuthHandler);
 app.use("/users", isLoggedIn, userRouter);
+app.use("/beers/rates", beerRouter); //isLoggedIn 미들웨어 필요없으므로 따로 분리
 app.use("/beers", beerRouter);
 app.use("/preferences", preferenceRouter);
 app.use("/favorites", favoriteRouter);

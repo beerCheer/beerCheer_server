@@ -65,7 +65,6 @@ const getAllBeersHandler = async (req, res, next) => {
   const page = parseInt(req.query.page);
   const per_page = parseInt(req.query.per_page);
   const isPreferenceOrRateChecked = req.query.isPreferenceOrRateChecked;
-
   if (!page || !per_page) {
     return res.status(400).json({
       message: "page, per_page 없음",
@@ -76,22 +75,28 @@ const getAllBeersHandler = async (req, res, next) => {
       message: "isPreferenceOrRateChecked 없음",
     });
   }
-  const beers = await getAllBeearsByPage(page, per_page, next);
+  try {
+    const beers = await getAllBeearsByPage(page, per_page, next);
 
-  if (isPreferenceOrRateChecked === "false") {
-    return res.json(beers);
-  } else {
-    const offset = (page - 1) * per_page;
-    const rates = await calculateAllRates(offset, per_page, next);
-    let rateIdx = 0;
-    const beerRateArr = beers.map((beer) => {
-      if (beer.id === rates[rateIdx].beerId) {
-        beer.avg = Number(rates[rateIdx].avg);
-        rateIdx++;
-      }
-      return beer;
-    });
-    return res.json(beerRateArr);
+    if (isPreferenceOrRateChecked === "false") {
+      return res.json(beers);
+    } else {
+      const offset = (page - 1) * per_page;
+      const rates = await calculateAllRates(offset, per_page, next);
+      let rateIdx = 0;
+      const beerRateArr = beers.map((beer) => {
+        if (beer.id === rates[rateIdx].beerId) {
+          beer.avg = Number(rates[rateIdx].avg);
+          rateIdx++;
+        }
+        return beer;
+      });
+
+      return res.json(beerRateArr);
+    }
+  } catch (err) {
+    console.log(err);
+    next(err);
   }
 };
 

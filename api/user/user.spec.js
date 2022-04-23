@@ -5,21 +5,6 @@ const models = require("../../models/index");
 const userSeed = require("../../dummyForTest/user");
 
 describe("Set up Database", () => {
-  // const users = [
-  //   {
-  //     nickname: "test1",
-  //     email: "test1@test.com",
-  //   },
-  //   {
-  //     nickname: "test2",
-  //     email: "test2@test.com",
-  //   },
-  //   {
-  //     nickname: "test3",
-  //     email: "test3@test.com",
-  //   },
-  // ];
-
   beforeEach("Sync DB", (done) => {
     models.sequelize.sync({ force: true }).then(() => {
       done();

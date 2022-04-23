@@ -6,7 +6,7 @@ const getAllBeearsByPage = async (page, per_page, next) => {
       `https://api.punkapi.com/v2/beers?page=${page}&per_page=${per_page}`
     );
     return new Promise((resolve) => {
-      resolve(beers);
+      resolve(beers.data);
     });
   } catch (err) {
     console.log(err);

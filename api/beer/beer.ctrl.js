@@ -17,7 +17,7 @@ const calculateAllRates = async (offset, limit, next) => {
       ],
       group: ["Rate.beerId"],
       raw: true,
-      order: sequelize.literal("avg DESC"),
+      order: sequelize.literal("beerId ASC"),
       offset,
       limit,
     });
@@ -79,14 +79,19 @@ const getAllBeersHandler = async (req, res, next) => {
   const beers = await getAllBeearsByPage(page, per_page, next);
 
   if (isPreferenceOrRateChecked === "false") {
-    return res.json(beers.data);
+    return res.json(beers);
   } else {
     const offset = (page - 1) * per_page;
     const rates = await calculateAllRates(offset, per_page, next);
-    return res.json({
-      rates,
-      beers: beers.data,
+    let rateIdx = 0;
+    const beerRateArr = beers.map((beer) => {
+      if (beer.id === rates[rateIdx].beerId) {
+        beer.avg = Number(rates[rateIdx].avg);
+        rateIdx++;
+      }
+      return beer;
     });
+    return res.json(beerRateArr);
   }
 };
 
@@ -103,11 +108,13 @@ const getTop12Handler = async (req, res, next) => {
       return beer.beerId;
     });
     const beers = await getTwelveBeersById(beerIdsArr, next);
-
-    return res.json({
-      beerAvgs,
-      beers: beers.data,
+    let rateIdx = 0;
+    const beerRateArr = beers.map((beer) => {
+      beer.avg = Number(beerAvgs[rateIdx].avg);
+      rateIdx++;
+      return beer;
     });
+    return res.json(beerRateArr);
   } catch (err) {
     console.log(err);
     next(err);

@@ -1,10 +1,10 @@
 const should = require("should");
 const request = require("supertest");
-const app = require("../../index");
-const models = require("../../models/index");
-const userSeed = require("../../dummyForTest/user");
-const rateSeed = require("../../dummyForTest/rates");
-const commentSeed = require("../../dummyForTest/comment");
+const app = require("../../../index");
+const models = require("../../../models");
+const userSeed = require("../../../dummyForTest/user");
+const rateSeed = require("../../../dummyForTest/rates");
+const commentSeed = require("../../../dummyForTest/comment");
 
 describe("Set up DB", () => {
   beforeEach("sync DB", (done) => {
@@ -34,14 +34,13 @@ describe("Set up DB", () => {
   });
 
   describe("createCommentHandler는", () => {
-    const beerId = 1;
     const content = "beer10 comment written by user1";
     describe("성공시", () => {
       it("201을 응답한다", (done) => {
         request(app)
-          .post("/comments")
+          .post("/beers/1/comments")
           .set("Cookie", ["accessToken", accessToken])
-          .send({ beerId, content })
+          .send({ content })
           .expect(201)
           .end(done);
       });
@@ -49,7 +48,7 @@ describe("Set up DB", () => {
     describe("실패시", () => {
       it("beerId 또는 content가 없는 경우 400과 'beerId 또는 content 없음'을 응답한다", (done) => {
         request(app)
-          .post("/comments")
+          .post("/beers/1/comments")
           .set("Cookie", ["accessToken", accessToken])
           .expect(400)
           .end((err, res) => {
@@ -65,17 +64,19 @@ describe("Set up DB", () => {
     describe("성공시", () => {
       it("204를 응답한다", (done) => {
         request(app)
-          .patch("/comments/1")
+          .patch("/beers/comments/1")
           .send({ content })
           .set("Cookie", ["accessToken", accessToken])
           .expect(204)
-          .end(done);
+          .end((err, res) => {
+            done();
+          });
       });
     });
     describe("실패시", () => {
       it("content가 없는 경우 400과 'commentId 또는 content 없음'을 응답한다", (done) => {
         request(app)
-          .patch("/comments/1")
+          .patch("/beers/comments/1")
           .set("Cookie", ["accessToken", accessToken])
           .expect(400)
           .end((err, res) => {
@@ -86,15 +87,15 @@ describe("Set up DB", () => {
     });
   });
 
-  describe("deleteCommentHandler는", () => {
-    describe("성공시", () => {
-      it("204를 응답한다", (done) => {
-        request(app)
-          .delete("/comments/1")
-          .set("Cookie", ["accessToken", accessToken])
-          .expect(204)
-          .end(done);
-      });
-    });
-  });
+  // describe("deleteCommentHandler는", () => {
+  //   describe("성공시", () => {
+  //     it("204를 응답한다", (done) => {
+  //       request(app)
+  //         .delete("/beers/comments/1")
+  //         .set("Cookie", ["accessToken", accessToken])
+  //         .expect(204)
+  //         .end(done);
+  //     });
+  //   });
+  // });
 });

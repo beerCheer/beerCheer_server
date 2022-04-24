@@ -145,7 +145,7 @@ const getAllCommentsByBeerId = async (req, res, next) => {
   const offset = (page - 1) * limit;
   try {
     const { count, rows } = await models.Comment.findAndCountAll({
-      attributes: ["content", "createdAt"],
+      attributes: ["id", "content", "createdAt"],
       where: {
         beerId,
       },
@@ -205,9 +205,49 @@ const favoriteBeerHandler = async (req, res, next) => {
   }
 };
 
+/* 
+로그인한 유저가 특정 아이디의 맥주 매긴 평점 조회
+  - 기능: 
+    - rates 테이블에서 로그인한 유저 아이디의 맥주 평점 조회
+*/
+const ratedBeerHandler = async (req, res, next) => {
+  try {
+    const beerId = parseInt(req.params.beerId, 10);
+    const userId = res.locals.id;
+
+    if (!beerId) {
+      return res.status(400).json({
+        message: "beerId 없음",
+      });
+    }
+
+    const beerRate = await models.Rate.findOne({
+      attributes: ["rate"],
+      where: {
+        beerId,
+        userId,
+      },
+      raw: true,
+    });
+    if (beerRate) {
+      return res.json({
+        isBeerRated: true,
+        rate: beerRate.rate,
+      });
+    }
+    return res.json({
+      isBeerRated: false,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
 module.exports = {
   getAllBeersHandler,
   getTop12Handler,
   getAllCommentsByBeerId,
   favoriteBeerHandler,
+  ratedBeerHandler,
 };

@@ -1,9 +1,9 @@
-const models = require("../../models/index");
+const models = require("../../../models");
 /*
 댓글 생성
 */
 const createCommentHandler = async (req, res, next) => {
-  if (!req.body.beerId || !req.body.content) {
+  if (!req.params.beerId || !req.body.content) {
     return res.status(400).json({
       message: "beerId 또는 content 없음",
     });
@@ -11,7 +11,7 @@ const createCommentHandler = async (req, res, next) => {
   try {
     await models.Comment.create({
       userId: res.locals.id,
-      beerId: req.body.beerId,
+      beerId: req.params.beerId,
       content: req.body.content,
     });
     return res.status(201).end();

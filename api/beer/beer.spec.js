@@ -6,6 +6,7 @@ const userSeed = require("../../dummyForTest/user");
 const rateSeed = require("../../dummyForTest/rates");
 const commentSeed = require("../../dummyForTest/comment");
 const favoriteSeed = require("../../dummyForTest/favorite");
+
 describe("Set up DB", () => {
   beforeEach("sync DB", (done) => {
     models.sequelize.sync({ force: true }).then(() => {
@@ -18,6 +19,17 @@ describe("Set up DB", () => {
     await models.Rate.bulkCreate(rateSeed);
     await models.Comment.bulkCreate(commentSeed);
     await models.Favorite.bulkCreate(favoriteSeed);
+  });
+
+  let accessToken;
+  before("login", (done) => {
+    request(app)
+      .post("/oauth")
+      .send({ nickname: userSeed[0].nickname, email: userSeed[0].email })
+      .end((err, res) => {
+        accessToken = res.headers["set-cookie"];
+        done();
+      });
   });
 
   describe("getAllBeersHandler는", () => {
@@ -115,16 +127,6 @@ describe("Set up DB", () => {
   });
 
   describe("favoriteBeerHandler는", () => {
-    let accessToken;
-    before("login", (done) => {
-      request(app)
-        .post("/oauth")
-        .send({ nickname: userSeed[0].nickname, email: userSeed[0].email })
-        .end((err, res) => {
-          accessToken = res.headers["set-cookie"];
-          done();
-        });
-    });
     describe("성공시", () => {
       it("로그인한 유저가 특정 아이디의 맥주를 보관(하트)를 눌렀다면, 'isFavoriteBeer: true'를 반환한다", (done) => {
         request(app)
@@ -145,6 +147,30 @@ describe("Set up DB", () => {
           });
       });
     });
-    describe("실패시", () => {});
+  });
+
+  describe("ratedBeerHandler는", () => {
+    describe("성공시", () => {
+      it("로그인한 유저가 특정 아이디의 맥주를 평가했다면, rate를 응답한다", (done) => {
+        request(app)
+          .get("/beers/1/rates")
+          .set("Cookie", ["accessToken", accessToken])
+          .end((err, res) => {
+            res.body.isBeerRated.should.be.true();
+            res.body.should.have.property("rate", 1);
+            done();
+          });
+      });
+
+      it("로그인한 유저가 특정 아이디의 맥주를 평가했다면, rate를 응답한다", (done) => {
+        request(app)
+          .get("/beers/100/rates")
+          .set("Cookie", ["accessToken", accessToken])
+          .end((err, res) => {
+            res.body.isBeerRated.should.be.false();
+            done();
+          });
+      });
+    });
   });
 });

@@ -126,7 +126,50 @@ const getTop12Handler = async (req, res, next) => {
   }
 };
 
+/* 
+특정 아이디의 맥주의 댓글 조회
+  - 기능: 
+    - 특정 맥주 아이디에 대한 모든 댓글 조회
+*/
+
+const getAllCommentsByBeerId = async (req, res, next) => {
+  const beerId = parseInt(req.params.beerId, 10);
+  const page = parseInt(req.query.page, 10);
+  const limit = parseInt(req.query.per_page, 10);
+  if (!beerId || !page || !limit) {
+    return res.status(400).json({
+      message: "beerId, page 또는 per_page 없음",
+    });
+  }
+
+  const offset = (page - 1) * limit;
+  try {
+    const { count, rows } = await models.Comment.findAndCountAll({
+      attributes: ["content", "createdAt"],
+      where: {
+        beerId,
+      },
+      include: [
+        {
+          model: models.User,
+          attributes: ["nickname"],
+          required: true,
+        },
+      ],
+      group: ["Comment.beerId"],
+      order: sequelize.literal(`Comment.createdAt ASC`),
+      offset,
+      limit,
+    });
+    return res.json({ count: count.length, rows });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
 module.exports = {
   getAllBeersHandler,
   getTop12Handler,
+  getAllCommentsByBeerId,
 };

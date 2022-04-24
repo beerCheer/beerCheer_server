@@ -12,6 +12,7 @@ const signUp = require("./api/middlewares/signUp");
 const OAuthHandler = require("./api/middlewares/OAuthHandler");
 const isLoggedIn = require("./api/middlewares/isLoggedIn");
 const { getTop12Handler } = require("./api/beer/beer.ctrl");
+const { getAllCommentsByBeerId } = require("./api/beer/beer.ctrl");
 
 require("dotenv").config();
 
@@ -32,7 +33,7 @@ app.use(cookieParser());
 app.post("/oauth", signUp, OAuthHandler);
 app.use("/users", isLoggedIn, userRouter);
 app.get("/beers/rates", getTop12Handler); //isLoggedIn 미들웨어 필요없으므로 따로 분리
-//app.use("/beers/:beerId", beerRouter);
+app.get("/beers/:beerId/comments", getAllCommentsByBeerId);
 app.use("/beers", beerRouter);
 app.use("/comments", commentRouter);
 app.use("/preferences", isLoggedIn, preferenceRouter);

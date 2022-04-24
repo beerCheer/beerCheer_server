@@ -13,7 +13,8 @@ const OAuthHandler = require("./api/middlewares/OAuthHandler");
 const isLoggedIn = require("./api/middlewares/isLoggedIn");
 const { getTop12Handler } = require("./api/beer/beer.ctrl");
 const { getAllCommentsByBeerId } = require("./api/beer/beer.ctrl");
-
+const { getAllBeersHandler } = require("./api/beer/beer.ctrl");
+const { favoriteBeerHandler } = require("./api/beer/beer.ctrl");
 require("dotenv").config();
 
 if (process.env.NODE_ENV !== "test") {
@@ -34,10 +35,11 @@ app.post("/oauth", signUp, OAuthHandler);
 app.use("/users", isLoggedIn, userRouter);
 app.get("/beers/rates", getTop12Handler); //isLoggedIn 미들웨어 필요없으므로 따로 분리
 app.get("/beers/:beerId/comments", getAllCommentsByBeerId);
-app.use("/beers", beerRouter);
-app.use("/comments", commentRouter);
+app.get("/beers/:beerId/favorites", isLoggedIn, favoriteBeerHandler);
+app.get("/beers", getAllBeersHandler);
+app.use("/comments", isLoggedIn, commentRouter);
 app.use("/preferences", isLoggedIn, preferenceRouter);
-app.use("/favorites", favoriteRouter);
+app.use("/favorites", isLoggedIn, favoriteRouter);
 
 app.use((err, req, res, next) => {
   console.log(err);

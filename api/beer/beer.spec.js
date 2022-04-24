@@ -5,7 +5,7 @@ const models = require("../../models/index");
 const userSeed = require("../../dummyForTest/user");
 const rateSeed = require("../../dummyForTest/rates");
 const commentSeed = require("../../dummyForTest/comment");
-
+const favoriteSeed = require("../../dummyForTest/favorite");
 describe("Set up DB", () => {
   beforeEach("sync DB", (done) => {
     models.sequelize.sync({ force: true }).then(() => {
@@ -17,6 +17,7 @@ describe("Set up DB", () => {
     await models.User.bulkCreate(userSeed);
     await models.Rate.bulkCreate(rateSeed);
     await models.Comment.bulkCreate(commentSeed);
+    await models.Favorite.bulkCreate(favoriteSeed);
   });
 
   describe("getAllBeersHandler는", () => {
@@ -111,5 +112,39 @@ describe("Set up DB", () => {
           });
       });
     });
+  });
+
+  describe("favoriteBeerHandler는", () => {
+    let accessToken;
+    before("login", (done) => {
+      request(app)
+        .post("/oauth")
+        .send({ nickname: userSeed[0].nickname, email: userSeed[0].email })
+        .end((err, res) => {
+          accessToken = res.headers["set-cookie"];
+          done();
+        });
+    });
+    describe("성공시", () => {
+      it("로그인한 유저가 특정 아이디의 맥주를 보관(하트)를 눌렀다면, 'isFavoriteBeer: true'를 반환한다", (done) => {
+        request(app)
+          .get("/beers/7/favorites")
+          .set("Cookie", ["accessToken", accessToken])
+          .end((err, res) => {
+            res.body.isFavoriteBeer.should.be.true();
+            done();
+          });
+      });
+      it("로그인한 유저가 특정 아이디의 맥주를 보관(하트)를 누르지 않았다면, 'isFavoriteBeer: false'를 반환한다", (done) => {
+        request(app)
+          .get("/beers/100/favorites")
+          .set("Cookie", ["accessToken", accessToken])
+          .end((err, res) => {
+            res.body.isFavoriteBeer.should.be.false();
+            done();
+          });
+      });
+    });
+    describe("실패시", () => {});
   });
 });

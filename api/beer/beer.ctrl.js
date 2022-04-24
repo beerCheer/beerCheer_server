@@ -168,8 +168,46 @@ const getAllCommentsByBeerId = async (req, res, next) => {
   }
 };
 
+/* 
+로그인한 유저가 특정 아이디의 맥주 보관(하트) 여부 조회
+  - 기능: 
+    - favorites 테이블에서 로그인한 유저 아이디의 보관 여부 조회
+*/
+const favoriteBeerHandler = async (req, res, next) => {
+  const beerId = parseInt(req.params.beerId, 10);
+  const userId = res.locals.id;
+
+  if (!beerId) {
+    return res.status(400).json({
+      message: "beerId 없음",
+    });
+  }
+  try {
+    const favoriteBeer = await models.Favorite.findOne({
+      where: {
+        beerId,
+        userId,
+      },
+      raw: true,
+    });
+    if (favoriteBeer) {
+      return res.json({
+        isFavoriteBeer: true,
+      });
+    } else {
+      return res.json({
+        isFavoriteBeer: false,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
 module.exports = {
   getAllBeersHandler,
   getTop12Handler,
   getAllCommentsByBeerId,
+  favoriteBeerHandler,
 };

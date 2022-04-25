@@ -11,12 +11,13 @@ const signUp = async (req, res, next) => {
       nickname,
       email,
     },
+    raw: true,
   })
     .then(([user, created]) => {
-      delete user.dataValues.email;
-      delete user.dataValues.isPreferenceOrRateChecked;
-      delete user.dataValues.isAdmin;
-      res.locals.user = user.dataValues;
+      delete user.email;
+      delete user.isPreferenceOrRateChecked;
+      //delete user.isAdmin;
+      res.locals.user = user;
       next();
     })
     .catch((err) => {

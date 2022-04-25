@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha api/beer/rate/rate.spec.js -w",
+    "test": "NODE_ENV=test mocha api/beer/comment/comment.spec.js -w",
     "start": "nodemon bin/server.js",
     "commit": "cz"
   },

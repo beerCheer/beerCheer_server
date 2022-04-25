@@ -65,6 +65,27 @@ const updateUserNickname = async (req, res, next) => {
 
 /*유저 탈퇴*/
 const deleteUser = async (req, res, next) => {
+  if (res.locals.isAdmin) {
+    try {
+      const id = parseInt(req.query.id, 10);
+      if (!id) {
+        return res.status(400).json({
+          message: "id 없음",
+        });
+      }
+      await models.User.destroy({
+        where: {
+          id,
+        },
+      });
+      return res.status(200).json({
+        message: `유저${id} 강제탈퇴`,
+      });
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  }
   try {
     await models.User.destroy({
       where: {

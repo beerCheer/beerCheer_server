@@ -87,15 +87,61 @@ describe("Set up DB", () => {
     });
   });
 
-  // describe("deleteCommentHandler는", () => {
-  //   describe("성공시", () => {
-  //     it("204를 응답한다", (done) => {
-  //       request(app)
-  //         .delete("/beers/comments/1")
-  //         .set("Cookie", ["accessToken", accessToken])
-  //         .expect(204)
-  //         .end(done);
-  //     });
-  //   });
-  // });
+  describe("deleteCommentHandler는", () => {
+    let accessTokenForAdmin;
+    beforeEach("login", (done) => {
+      request(app)
+        .post("/oauth")
+        .send({ nickname: userSeed[1].nickname, email: userSeed[1].email })
+        .end((err, res) => {
+          accessTokenForAdmin = res.headers["set-cookie"];
+          done();
+        });
+    });
+
+    describe("성공시", () => {
+      it("204를 응답한다", (done) => {
+        request(app)
+          .delete("/beers/comments/1")
+          .set("Cookie", ["accessToken", accessToken])
+          .expect(204)
+          .end(done);
+      });
+
+      it("isAdmin=true인 경우 200과 '댓글1 강제 삭제' 응답한다", (done) => {
+        request(app)
+          .delete("/beers/comments/1")
+          .set("Cookie", ["accessToken", accessTokenForAdmin])
+          .expect(200)
+          .end((err, res) => {
+            should.equal(res.body.message, "어드민 댓글1 강제 삭제");
+            done();
+          });
+      });
+    });
+
+    describe("실패시", () => {
+      it("404과 '댓글 삭제 실패'을 응답한다", (done) => {
+        request(app)
+          .delete("/beers/comments/1000")
+          .set("Cookie", ["accessToken", accessToken])
+          .expect(400)
+          .end((err, res) => {
+            should.equal(res.body.message, "댓글 삭제 실패");
+            done();
+          });
+      });
+
+      it("isAdmin=true인 경우, 404과 '댓글 삭제 실패'을 응답한다", (done) => {
+        request(app)
+          .delete("/beers/comments/1000")
+          .set("Cookie", ["accessToken", accessTokenForAdmin])
+          .expect(404)
+          .end((err, res) => {
+            should.equal(res.body.message, "어드민 댓글 삭제 실패");
+            done();
+          });
+      });
+    });
+  });
 });

@@ -27,6 +27,14 @@ module.exports = {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
       },
+      malt: {
+        type: Sequelize.DataTypes.STRING(30),
+        allowNull: false,
+      },
+      quantity: {
+        type: Sequelize.DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DataTypes.DATE,

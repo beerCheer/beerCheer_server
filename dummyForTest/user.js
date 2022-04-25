@@ -10,6 +10,7 @@ const users = [
     nickname: "test2",
     email: "test2@test.com",
     isPreferenceOrRateChecked: true,
+    isAdmin: true,
     createdAt: new Date(),
     updatedAt: new Date(),
   },

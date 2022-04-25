@@ -19,7 +19,7 @@ describe("Set up Database", () => {
   beforeEach("login", (done) => {
     request(app)
       .post("/oauth")
-      .send({ nickname: userSeed[1].nickname, email: userSeed[1].email })
+      .send({ nickname: userSeed[0].nickname, email: userSeed[0].email })
       .end((err, res) => {
         accessToken = res.headers["set-cookie"];
         done();
@@ -31,7 +31,7 @@ describe("Set up Database", () => {
       it("쿠키에 액세스 토큰을 저장한다", (done) => {
         request(app)
           .post("/oauth")
-          .send({ nickname: userSeed[1].nickname, email: userSeed[1].email })
+          .send({ nickname: userSeed[0].nickname, email: userSeed[0].email })
           .end((err, res) => {
             res.headers["set-cookie"].should.have.lengthOf(1);
             done();
@@ -45,7 +45,7 @@ describe("Set up Database", () => {
       it("401과 'accessToken 없음'을 응답한다", (done) => {
         request(app)
           .post("/users/userInfo")
-          .send({ nickname: userSeed[1].nickname })
+          .send({ nickname: userSeed[0].nickname })
           .expect(401)
           .end((err, res) => {
             should.equal(res.body.message, "accessToken 없음");
@@ -61,7 +61,7 @@ describe("Set up Database", () => {
         request(app)
           .post("/users/userInfo")
           .set("Cookie", ["accessToken", accessToken])
-          .send({ nickname: userSeed[1].nickname })
+          .send({ nickname: userSeed[0].nickname })
           .end((err, res) => {
             should.equal(res.body.message, "사용중인 닉네임");
             done();
@@ -130,6 +130,16 @@ describe("Set up Database", () => {
   });
 
   describe("deleteUser는", () => {
+    let accessTokenForAdmin;
+    beforeEach("login", (done) => {
+      request(app)
+        .post("/oauth")
+        .send({ nickname: userSeed[1].nickname, email: userSeed[1].email })
+        .end((err, res) => {
+          accessTokenForAdmin = res.headers["set-cookie"];
+          done();
+        });
+    });
     describe("성공시", () => {
       it("204를 응답한다", (done) => {
         request(app)
@@ -137,6 +147,29 @@ describe("Set up Database", () => {
           .set("Cookie", ["accessToken", accessToken])
           .expect(204)
           .end(done);
+      });
+
+      it("isAdmin=true인 경우 200과 '유저4 강제탈퇴' 응답한다", (done) => {
+        request(app)
+          .delete("/users?id=4")
+          .set("Cookie", ["accessToken", accessTokenForAdmin])
+          .end((err, res) => {
+            should.equal(res.body.message, "유저4 강제탈퇴");
+            done();
+          });
+      });
+    });
+
+    describe("실패시", () => {
+      it("isAdmin=true이지만, req.query.id가 없는 경우 400과 'id 없음'을 응답한다", (done) => {
+        request(app)
+          .delete("/users")
+          .set("Cookie", ["accessToken", accessTokenForAdmin])
+          .expect(400)
+          .end((err, res) => {
+            should.equal(res.body.message, "id 없음");
+            done();
+          });
       });
     });
   });

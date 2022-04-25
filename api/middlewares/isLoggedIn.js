@@ -6,6 +6,7 @@ const isLoggedIn = async (req, res, next) => {
     if (accessToken) {
       const decoded = await decodeAccessToken(accessToken);
       res.locals.id = decoded.id;
+      res.locals.isAdmin = decoded.isAdmin;
       next();
     } else {
       return res.status(401).json({

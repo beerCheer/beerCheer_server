@@ -12,6 +12,16 @@ const createRateHandler = async (req, res, next) => {
       beerId: parseInt(req.params.beerId, 10),
       rate: parseInt(req.body.rate, 10),
     });
+    await models.User.update(
+      {
+        isPreferenceOrRateChecked: true,
+      },
+      {
+        where: {
+          id: parseInt(res.locals.id, 10),
+        },
+      }
+    );
     return res.status(201).end();
   } catch (err) {
     console.log(err);

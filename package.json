@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha api/admin/admin.spec.js -w",
+    "test": "NODE_ENV=test mocha api/recommend/recommend.spec.js -w",
     "start": "nodemon bin/server.js",
     "commit": "cz"
   },

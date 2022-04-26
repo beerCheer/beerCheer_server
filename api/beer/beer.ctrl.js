@@ -6,9 +6,36 @@ const {
   getAllBeearsByPage,
   getTwelveBeersById,
   getBeersByName,
+  getBeerById,
 } = require("../punk");
 
-/*별점 조회*/
+/*맥주 아이디의 평균 별점 조회*/
+const calculateRate = async (beerId, next) => {
+  try {
+    const ratedData = await models.Rate.findOne({
+      attributes: [
+        "beerId",
+        [
+          sequelize.fn("round", sequelize.fn("avg", sequelize.col("rate")), 2),
+          "avg",
+        ],
+      ],
+      where: {
+        beerId,
+      },
+      group: ["Rate.beerId"],
+      raw: true,
+    });
+    return new Promise((resolve) => {
+      return resolve(ratedData);
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+/*맥주 아이디별 평균 별점 조회*/
 const calculateAllRates = async (offset, limit, next) => {
   try {
     const ratedData = await models.Rate.findAll({
@@ -59,6 +86,7 @@ const calculateTop12Rates = async (req, res, next) => {
   }
 };
 
+/*유저가 보관한 맥주 아이디 조회*/
 const getLikedBeersByUserId = async (userId, next) => {
   try {
     const likedData = await models.Favorite.findAll({
@@ -77,6 +105,64 @@ const getLikedBeersByUserId = async (userId, next) => {
     next(err);
   }
 };
+
+const getLikedBeerByUserIdAndBeerId = async (userId, beerId, next) => {
+  try {
+    const likedData = await models.Favorite.findOne({
+      where: {
+        userId,
+        beerId,
+      },
+      attributes: ["beerId", "userId"],
+      raw: true,
+    });
+    return new Promise((resolve) => {
+      return resolve(likedData);
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+/*
+맥주 아이디로 맥주 데이터 조회
+  - 기능: 맥주 디테일 페이지에 맥주 데이터 사용
+    - 맥주 데이터
+    - 평균 별점
+    - 유저의 별점 (로그인한 경우)
+    - 하트여부 (로그인한 경우) 
+*/
+const getBeerByBeerIdHandler = async (req, res, next) => {
+  const beerId = parseInt(req.params.beerId, 10);
+  const userId = parseInt(req.query.id, 10);
+  try {
+    const values = await Promise.allSettled([
+      getBeerById(beerId, next),
+      calculateRate(beerId, next),
+    ]);
+    const rate = values[1].value ? values[1].value.avg : "별점없음";
+    if (userId) {
+      const like = await getLikedBeerByUserIdAndBeerId(userId, beerId, next);
+      const isLiked = like ? true : false;
+
+      return res.json({
+        beer: values[0].value[0],
+        rate,
+        isLiked,
+      });
+    }
+
+    return res.json({
+      beer: values[0].value[0],
+      rate: values[1].value.avg,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
 /*
 맥주 이름으로 검색
   - 기능: OpenAPI에 이름으로 맥주 조회 
@@ -116,22 +202,6 @@ const getBeersByNameHandler = async (req, res, next) => {
     console.log(err);
     next(err);
   }
-  // try {
-  //   const beers = await getBeersByName(name, next);
-  //   const offset = 0;
-  //   const limit = beers.length;
-  //   const rates = await calculateAllRates(offset, limit, next);
-  //   console.log(res.locals.id);
-  //   if (res.locals.id) {
-  //     const likes = await getLikedBeersByUserId(res.locals.id, next);
-  //   }
-  //   console.log(beers, rates);
-  //   let rateIdx = 0;
-  //   return res.end();
-  // } catch (err) {
-  //   console.log(err);
-  //   next(err);
-  // }
 };
 
 /*
@@ -178,7 +248,8 @@ const getAllBeersHandler = async (req, res, next) => {
         const likes = await getLikedBeersByUserId(userId, next);
         const beerRateLikesArr = beerRateArr.map((beer) => {
           if (beer.id === likes[0].beerId) {
-            (beer.favorite = true), likes.shift();
+            beer.favorite = true;
+            likes.shift();
           }
           return beer;
         });
@@ -343,4 +414,5 @@ module.exports = {
   favoriteBeerHandler,
   ratedBeerHandler,
   getBeersByNameHandler,
+  getBeerByBeerIdHandler,
 };

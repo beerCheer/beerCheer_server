@@ -32,6 +32,52 @@ describe("Set up DB", () => {
       });
   });
 
+  describe("getBeerByBeerIdHandler는", () => {
+    describe("성공시", () => {
+      it("유저 아이디가 없는 경우, 맥주와 평균 별점만 응답한다", (done) => {
+        request(app)
+          .get("/beers/1")
+          .end((err, res) => {
+            res.body.beer.should.be.instanceOf(Object);
+            should.equal(res.body.rate, "3.00");
+            done();
+          });
+      });
+
+      it("유저 아이디가 있는 경우, 맥주와 평균 별점, 그리고 보관 여부도 응답하며, 보관하는 맥주일 경우 isLiked는 true이다", (done) => {
+        request(app)
+          .get("/beers/1?id=1")
+          .end((err, res) => {
+            res.body.beer.should.be.instanceOf(Object);
+            should.equal(res.body.rate, "3.00");
+            res.body.isLiked.should.be.true();
+            done();
+          });
+      });
+
+      it("유저 아이디가 있는 경우, 맥주와 평균 별점, 그리고 보관 여부도 응답하며, 보관하지 않는 맥주일 경우 isLiked는 false이다", (done) => {
+        request(app)
+          .get("/beers/2?id=1")
+          .end((err, res) => {
+            res.body.beer.should.be.instanceOf(Object);
+            should.equal(res.body.rate, "3.00");
+            res.body.isLiked.should.not.be.true();
+            done();
+          });
+      });
+
+      it("해당 맥주에 대한 별점이 아직 없는 경우 rate는 '별점없음'이다", (done) => {
+        request(app)
+          .get("/beers/123?id=1")
+          .end((err, res) => {
+            console.log(res.body);
+            should.equal(res.body.rate, "별점없음");
+            done();
+          });
+      });
+    });
+  });
+
   describe("getAllBeersHandler는", () => {
     describe("성공시", () => {
       it("isPreferenceOrRateChecked가 true인 경우 맥주 객체 내에 avg 값을 포함한다", (done) => {

@@ -14,8 +14,8 @@ const signUp = async (req, res, next) => {
     raw: true,
   })
     .then(([user, created]) => {
-      delete user.email;
-      delete user.isPreferenceOrRateChecked;
+      // delete user.email;
+      // delete user.isPreferenceOrRateChecked;
       //delete user.isAdmin;
       res.locals.user = user;
       next();

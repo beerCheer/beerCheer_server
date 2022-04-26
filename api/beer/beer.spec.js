@@ -50,6 +50,22 @@ describe("Set up DB", () => {
             done();
           });
       });
+      it("userId가 있는 경우 유저가 보관한 맥주인지 favorite: true를 포함한다", (done) => {
+        request(app)
+          .get("/beers?page=1&per_page=7&isPreferenceOrRateChecked=true&id=1")
+          .end((err, res) => {
+            res.body[6].should.have.keys("favorite");
+            done();
+          });
+      });
+      it("userId가 없는 경우 유저가 보관한 맥주인지 favorite를 포함하지 않는다", (done) => {
+        request(app)
+          .get("/beers?page=1&per_page=7&isPreferenceOrRateChecked=true")
+          .end((err, res) => {
+            res.body[6].should.not.have.keys("favorite");
+            done();
+          });
+      });
     });
     describe("실패시", () => {
       it("page 또는 per_page가 없는 경우 'page, per_page 없음'을 응답한다", (done) => {
@@ -60,14 +76,14 @@ describe("Set up DB", () => {
             done();
           });
       });
-      it("isPreferenceOrRateChecked가 없는 경우 'isPreferenceOrRateChecked 없음'을 응답한다", (done) => {
-        request(app)
-          .get("/beers?page=1&per_page=3")
-          .end((err, res) => {
-            should.equal(res.body.message, "isPreferenceOrRateChecked 없음");
-            done();
-          });
-      });
+      // it("isPreferenceOrRateChecked가 없는 경우 'isPreferenceOrRateChecked 없음'을 응답한다", (done) => {
+      //   request(app)
+      //     .get("/beers?page=1&per_page=3")
+      //     .end((err, res) => {
+      //       should.equal(res.body.message, "isPreferenceOrRateChecked 없음");
+      //       done();
+      //     });
+      // });
     });
   });
 

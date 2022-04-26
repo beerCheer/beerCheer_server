@@ -2,7 +2,11 @@ const { Op } = require("sequelize");
 const { sequelize } = require("../../models/index");
 const models = require("../../models/index");
 
-const { getAllBeearsByPage, getTwelveBeersById } = require("../punk");
+const {
+  getAllBeearsByPage,
+  getTwelveBeersById,
+  getBeersByName,
+} = require("../punk");
 
 /*별점 조회*/
 const calculateAllRates = async (offset, limit, next) => {
@@ -55,24 +59,103 @@ const calculateTop12Rates = async (req, res, next) => {
   }
 };
 
+const getLikedBeersByUserId = async (userId, next) => {
+  try {
+    const likedData = await models.Favorite.findAll({
+      where: {
+        userId,
+      },
+      attributes: ["beerId"],
+      order: sequelize.literal("beerId ASC"),
+      raw: true,
+    });
+    return new Promise((resolve) => {
+      return resolve(likedData);
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+/*
+맥주 이름으로 검색
+  - 기능: OpenAPI에 이름으로 맥주 조회 
+    - 맥주 데이터와 평점, 하트 여부 
+*/
+const getBeersByNameHandler = async (req, res, next) => {
+  const name = req.query.name;
+  const userId = parseInt(req.query.id, 10);
+  try {
+    const beers = await getBeersByName(name, next);
+    const offset = 0;
+    const limit = beers.length;
+    const rates = await calculateAllRates(offset, limit, next);
+    let rateIdx = 0;
+    let beerRateArr = beers.map((beer) => {
+      if (beer.id === rates[rateIdx].beerId) {
+        beer.avg = Number(rates[rateIdx].avg);
+        rateIdx++;
+      }
+      return beer;
+    });
+
+    if (userId) {
+      console.log(userId);
+      const likes = await getLikedBeersByUserId(userId, next); //[ { beerId: 7 } ]
+      const beerRateLikesArr = beerRateArr.map((beer) => {
+        if (beer.id === likes[0].beerId) {
+          beer.favorite = true;
+          likes.shift();
+        }
+        return beer;
+      });
+      return res.json(beerRateLikesArr);
+    }
+    return res.json(beerRateArr);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+  // try {
+  //   const beers = await getBeersByName(name, next);
+  //   const offset = 0;
+  //   const limit = beers.length;
+  //   const rates = await calculateAllRates(offset, limit, next);
+  //   console.log(res.locals.id);
+  //   if (res.locals.id) {
+  //     const likes = await getLikedBeersByUserId(res.locals.id, next);
+  //   }
+  //   console.log(beers, rates);
+  //   let rateIdx = 0;
+  //   return res.end();
+  // } catch (err) {
+  //   console.log(err);
+  //   next(err);
+  // }
+};
+
 /*
 모든 맥주 조회
-  - 기능: isPreferenceOrRateChecked 여부에 따라 
+  - 기능: isPreferenceOrRateChecked에 따라 
     - 선호 맥주 선택 페이지에서 보여질 맥주 데이터만 조회
     - 전체 맥주 페이지에서 보여질 맥주 데이터와 평점만 조회
 */
 const getAllBeersHandler = async (req, res, next) => {
   const page = parseInt(req.query.page);
   const per_page = parseInt(req.query.per_page);
+  // const name = req.query.name;
   const isPreferenceOrRateChecked = req.query.isPreferenceOrRateChecked;
+  const userId = parseInt(req.query.id, 10);
+
+  // if (isPreferenceOrRateChecked == undefined) {
+  //   return res.status(400).json({
+  //     message: "isPreferenceOrRateChecked 없음",
+  //   });
+  // }
+
   if (!page || !per_page) {
     return res.status(400).json({
       message: "page, per_page 없음",
-    });
-  }
-  if (isPreferenceOrRateChecked == undefined) {
-    return res.status(400).json({
-      message: "isPreferenceOrRateChecked 없음",
     });
   }
   try {
@@ -91,7 +174,16 @@ const getAllBeersHandler = async (req, res, next) => {
         }
         return beer;
       });
-
+      if (userId) {
+        const likes = await getLikedBeersByUserId(userId, next);
+        const beerRateLikesArr = beerRateArr.map((beer) => {
+          if (beer.id === likes[0].beerId) {
+            (beer.favorite = true), likes.shift();
+          }
+          return beer;
+        });
+        return res.json(beerRateLikesArr);
+      }
       return res.json(beerRateArr);
     }
   } catch (err) {
@@ -250,4 +342,5 @@ module.exports = {
   getAllCommentsByBeerId,
   favoriteBeerHandler,
   ratedBeerHandler,
+  getBeersByNameHandler,
 };

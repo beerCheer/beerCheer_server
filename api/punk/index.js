@@ -48,8 +48,23 @@ const getBeersByMalt = async (malt, next) => {
     next(err);
   }
 };
+
+const getBeersByName = async (name, next) => {
+  name = name.replace(" ", "_");
+  let punkUrl = `https://api.punkapi.com/v2/beers?beer_name=${name}`;
+  try {
+    const beers = await axios.get(punkUrl);
+    return new Promise((resolve) => {
+      resolve(beers.data);
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
 module.exports = {
   getAllBeearsByPage,
   getTwelveBeersById,
   getBeersByMalt,
+  getBeersByName,
 };

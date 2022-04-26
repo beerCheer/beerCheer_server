@@ -9,6 +9,7 @@ router.post("/:beerId/rates", isLoggedIn, ratectrl.createRateHandler);
 router.patch("/:beerId/rates", isLoggedIn, ratectrl.updateRateHandler);
 router.get("/rates", ctrl.getTop12Handler);
 router.get("/", ctrl.getAllBeersHandler);
+router.get("/search", ctrl.getBeersByNameHandler);
 router.get("/:beerId/comments", ctrl.getAllCommentsByBeerId);
 router.get("/:beerId/favorites", isLoggedIn, ctrl.favoriteBeerHandler);
 router.get("/:beerId/rates", isLoggedIn, ctrl.ratedBeerHandler);

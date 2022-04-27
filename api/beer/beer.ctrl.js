@@ -339,7 +339,6 @@ const getAllCommentsByBeerId = async (req, res, next) => {
 const favoriteBeerHandler = async (req, res, next) => {
   const beerId = parseInt(req.params.beerId, 10);
   const userId = res.locals.id;
-
   if (!beerId) {
     return res.status(400).json({
       message: "beerId 없음",

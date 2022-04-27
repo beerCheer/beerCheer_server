@@ -319,12 +319,14 @@ const getAllCommentsByBeerId = async (req, res, next) => {
           required: true,
         },
       ],
-      group: ["Comment.beerId"],
+      //group: ["Comment.beerId"],
       order: sequelize.literal(`Comment.createdAt ASC`),
       offset,
       limit,
+      raw: true,
     });
-    return res.json({ count: count.length, rows });
+    const totalPages = Math.ceil(count / limit);
+    return res.json({ page, totalResults: count, totalPages, rows });
   } catch (err) {
     console.log(err);
     next(err);

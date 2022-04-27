@@ -2,7 +2,21 @@ const comments = [
   {
     userId: 1,
     beerId: 1,
-    content: "nickname test1 writing test content",
+    content: "nickname test1 writing test content for beerId1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    userId: 2,
+    beerId: 1,
+    content: "nickname test2 writing test content for beerId1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    userId: 3,
+    beerId: 1,
+    content: "nickname test2 writing test content for beerId3",
     createdAt: new Date(),
     updatedAt: new Date(),
   },

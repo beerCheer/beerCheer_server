@@ -148,29 +148,42 @@ describe("Set up DB", () => {
 
   describe("getAllCommentsByBeerId는", () => {
     describe("성공시", () => {
-      it("응답객체는 count와 rows 키값을 갖는다.", (done) => {
+      it("응답객체는 page, totalPages, totalResults,rows 키값을 갖는다.", (done) => {
         request(app)
           .get("/beers/1/comments?page=1&per_page=3")
           .end((err, res) => {
-            res.body.should.have.keys("count", "rows");
+            console.log(res.body);
+            res.body.should.have.keys(
+              "page",
+              "totalResults",
+              "totalPages",
+              "rows"
+            );
             done();
           });
       });
-      it("맥주 아이디에 대한 댓글이 있다면 count와 rows.length는 1 이상이다.", (done) => {
+      it("맥주 아이디에 대한 댓글이 있다면 page, totalPages, totalResults, rows 값을 갖는다.", (done) => {
         request(app)
           .get("/beers/1/comments?page=1&per_page=3")
           .end((err, res) => {
-            should.equal(res.body.count, 1);
-            res.body.rows.should.have.a.lengthOf(1);
+            res.body.should.have.keys(
+              "page",
+              "totalPages",
+              "totalResults",
+              "rows"
+            );
             done();
           });
       });
-      it("맥주 아이디에 대한 댓글이 없다면 count와 rows.length는 0이다.", (done) => {
+
+      it("맥주 아이디에 대한 댓글이 없다면 page=1, totalPages=0, totalResults=0, rows=[]이다.", (done) => {
         request(app)
           .get("/beers/100/comments?page=1&per_page=3")
           .end((err, res) => {
-            should.equal(res.body.count, 0);
-            res.body.rows.should.be.empty;
+            should.equal(res.body.page, 1);
+            should.equal(res.body.totalPages, 0);
+            should.equal(res.body.totalResults, 0);
+            res.body.rows.should.be.empty();
             done();
           });
       });

@@ -1,6 +1,5 @@
 #!/bin/bash
 cd /home/ubuntu/beerCheer_server
-npm install npm -g
 npm install
 npm install pm2@latest -g
 sudo apt-get update

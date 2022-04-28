@@ -1,6 +1,33 @@
 const { Op } = require("sequelize");
 const models = require("../../models/index");
 
+/*유저 정보 조회*/
+const getUser = async (req, res, next) => {
+  try {
+    const userId = parseInt(req.params.userId, 10);
+    if (userId === res.locals.id) {
+      const userData = await models.User.findOne({
+        attributes: [
+          "id",
+          "nickname",
+          "email",
+          "isPreferenceOrRateChecked",
+          "isAdmin",
+        ],
+        where: {
+          id: userId,
+        },
+        raw: true,
+      });
+      return res.json(userData);
+    }
+    return res.status(403).end();
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
 /*유저 로그아웃*/
 const logoutUser = (req, res, next) => {
   try {
@@ -103,4 +130,5 @@ module.exports = {
   nicknameValidationCheck,
   updateUserNickname,
   deleteUser,
+  getUser,
 };

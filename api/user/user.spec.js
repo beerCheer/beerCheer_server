@@ -18,7 +18,7 @@ describe("Set up Database", () => {
   let accessToken;
   beforeEach("login", (done) => {
     request(app)
-      .post("/oauth")
+      .post("/kakao")
       .send({ nickname: userSeed[0].nickname, email: userSeed[0].email })
       .end((err, res) => {
         accessToken = res.headers["set-cookie"];
@@ -26,19 +26,48 @@ describe("Set up Database", () => {
       });
   });
 
-  describe("OauthHandler는", () => {
+  describe("getUser는", () => {
     describe("성공시", () => {
-      it("쿠키에 액세스 토큰을 저장한다", (done) => {
+      it("유저 정보를 담은 객체를 응답한다", (done) => {
         request(app)
-          .post("/oauth")
-          .send({ nickname: userSeed[0].nickname, email: userSeed[0].email })
+          .get("/users/1")
+          .set("Cookie", ["accessToken", accessToken])
           .end((err, res) => {
-            res.headers["set-cookie"].should.have.lengthOf(1);
+            res.body.should.have.keys(
+              "id",
+              "nickname",
+              "email",
+              "isPreferenceOrRateChecked",
+              "isAdmin"
+            );
             done();
           });
       });
     });
+    describe("실패시", () => {
+      it("로그인한 유저와 요청하는 유저의 아이디가 다를 경우, 403을 응답한다", (done) => {
+        request(app)
+          .get("/users/1000")
+          .set("Cookie", ["accessToken", accessToken])
+          .expect(403)
+          .end(done);
+      });
+    });
   });
+
+  // describe("OauthHandler는", () => {
+  //   describe("성공시", () => {
+  //     it("쿠키에 액세스 토큰을 저장한다", (done) => {
+  //       request(app)
+  //         .post("/oauth")
+  //         .send({ nickname: userSeed[0].nickname, email: userSeed[0].email })
+  //         .end((err, res) => {
+  //           res.headers["set-cookie"].should.have.lengthOf(1);
+  //           done();
+  //         });
+  //     });
+  //   });
+  // });
 
   describe("isLoggedIn는", () => {
     describe("실패시", () => {
@@ -133,7 +162,7 @@ describe("Set up Database", () => {
     let accessTokenForAdmin;
     beforeEach("login", (done) => {
       request(app)
-        .post("/oauth")
+        .post("/kakao")
         .send({ nickname: userSeed[1].nickname, email: userSeed[1].email })
         .end((err, res) => {
           accessTokenForAdmin = res.headers["set-cookie"];

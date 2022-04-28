@@ -11,7 +11,7 @@ const signUp = async (req, res, next) => {
     nickname = res.locals.naver.nickname;
     email = res.locals.naver.email;
   }
-  console.log(nickname, email);
+
   models.User.findOrCreate({
     where: {
       [Op.or]: [{ nickname }, { email }],

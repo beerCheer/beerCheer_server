@@ -24,12 +24,42 @@ describe("Set up DB", () => {
   let accessToken;
   before("login", (done) => {
     request(app)
-      .post("/oauth")
+      .post("/kakao")
       .send({ nickname: userSeed[0].nickname, email: userSeed[0].email })
       .end((err, res) => {
         accessToken = res.headers["set-cookie"];
         done();
       });
+  });
+
+  describe("getBeersByNameHandler는 ", () => {
+    describe("성공시", () => {
+      it("검색한 맥주에 대한 별점 데이터가 없는 경우, avg 값이 존재하지 않는다", (done) => {
+        request(app)
+          .get("/beers/search?name=AB:12")
+          .end((err, res) => {
+            res.body.should.have.keys("totalResults", "result");
+            res.body.result[0].should.not.have.keys("avg");
+            done();
+          });
+      });
+      it("검색한 맥주에 대한 별점 데이터가 있는 경우, avg 값을 포함해 응답한다", (done) => {
+        request(app)
+          .get("/beers/search?name=Buzz")
+          .end((err, res) => {
+            should.equal(res.body.result[0].avg, 3);
+            done();
+          });
+      });
+      it("유저 아이디가 있는 경우, 해당 유저가 맥주를 보관했는지 확인 후 favorite 값을 포함해 응답한다", (done) => {
+        request(app)
+          .get("/beers/search?name=Buzz&id=1")
+          .end((err, res) => {
+            res.body.result[0].favorite.should.be.true();
+            done();
+          });
+      });
+    });
   });
 
   describe("getBeerByBeerIdHandler는", () => {
@@ -39,18 +69,18 @@ describe("Set up DB", () => {
           .get("/beers/1")
           .end((err, res) => {
             res.body.beer.should.be.instanceOf(Object);
-            should.equal(res.body.rate, "3.00");
+            should.equal(res.body.avg, 3);
             done();
           });
       });
 
-      it("유저 아이디가 있는 경우, 맥주와 평균 별점, 그리고 보관 여부도 응답하며, 보관하는 맥주일 경우 isLiked는 true이다", (done) => {
+      it("유저 아이디가 있는 경우, 맥주와 평균 별점, 그리고 보관 여부도 응답하며, 보관하는 맥주일 경우 favorite는 true이다", (done) => {
         request(app)
           .get("/beers/1?id=1")
           .end((err, res) => {
             res.body.beer.should.be.instanceOf(Object);
-            should.equal(res.body.rate, "3.00");
-            res.body.isLiked.should.be.true();
+            should.equal(res.body.avg, 3);
+            res.body.favorite.should.be.true();
             done();
           });
       });
@@ -60,8 +90,8 @@ describe("Set up DB", () => {
           .get("/beers/2?id=1")
           .end((err, res) => {
             res.body.beer.should.be.instanceOf(Object);
-            should.equal(res.body.rate, "3.00");
-            res.body.isLiked.should.not.be.true();
+            should.equal(res.body.avg, 3);
+            res.body.favorite.should.not.be.true();
             done();
           });
       });
@@ -70,8 +100,7 @@ describe("Set up DB", () => {
         request(app)
           .get("/beers/123?id=1")
           .end((err, res) => {
-            console.log(res.body);
-            should.equal(res.body.rate, "별점없음");
+            should.equal(res.body.avg, 0);
             done();
           });
       });
@@ -84,7 +113,13 @@ describe("Set up DB", () => {
         request(app)
           .get("/beers?page=1&per_page=3&isPreferenceOrRateChecked=true")
           .end((err, res) => {
-            res.body[0].should.have.keys("avg");
+            res.body.should.have.keys(
+              "page",
+              "totalPages",
+              "totalResults",
+              "result"
+            );
+            res.body.result[0].should.have.keys("avg");
             done();
           });
       });
@@ -92,7 +127,7 @@ describe("Set up DB", () => {
         request(app)
           .get("/beers?page=1&per_page=3&isPreferenceOrRateChecked=false")
           .end((err, res) => {
-            res.body.should.not.have.keys("avg");
+            res.body[0].should.not.have.keys("avg");
             done();
           });
       });
@@ -100,7 +135,7 @@ describe("Set up DB", () => {
         request(app)
           .get("/beers?page=1&per_page=7&isPreferenceOrRateChecked=true&id=1")
           .end((err, res) => {
-            res.body[6].should.have.keys("favorite");
+            res.body.result[6].should.have.keys("favorite");
             done();
           });
       });
@@ -108,7 +143,7 @@ describe("Set up DB", () => {
         request(app)
           .get("/beers?page=1&per_page=7&isPreferenceOrRateChecked=true")
           .end((err, res) => {
-            res.body[6].should.not.have.keys("favorite");
+            res.body.result[6].should.not.have.keys("favorite");
             done();
           });
       });
@@ -152,7 +187,6 @@ describe("Set up DB", () => {
         request(app)
           .get("/beers/1/comments?page=1&per_page=3")
           .end((err, res) => {
-            console.log(res.body);
             res.body.should.have.keys(
               "page",
               "totalResults",
@@ -232,7 +266,7 @@ describe("Set up DB", () => {
           .set("Cookie", ["accessToken", accessToken])
           .end((err, res) => {
             res.body.isBeerRated.should.be.true();
-            res.body.should.have.property("rate", 1);
+            res.body.should.have.property("avg", 1);
             done();
           });
       });

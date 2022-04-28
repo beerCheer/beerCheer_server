@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.post("/naver", naverLogin, signUp, OAuthHandler);
-//app.post("/kakao", signUp, OAuthHandler);
+app.post("/kakao", signUp, OAuthHandler);
 app.use("/users", isLoggedIn, userRouter);
 app.use("/beers", beerRouter);
 app.use("/admin", isLoggedIn, adminRouter);

@@ -2,9 +2,16 @@ const { Op } = require("sequelize");
 const models = require("../../models/index");
 
 const signUp = async (req, res, next) => {
-  console.log(res.locals.naver, "signup");
-  const { nickname, email } = res.locals.naver;
-  //const { nickname, email } = req.body;
+  let nickname;
+  let email;
+  if (req.path === "/kakao") {
+    nickname = req.body.nickname;
+    email = req.body.email;
+  } else {
+    nickname = res.locals.naver.nickname;
+    email = res.locals.naver.email;
+  }
+  console.log(nickname, email);
   models.User.findOrCreate({
     where: {
       [Op.or]: [{ nickname }, { email }],
@@ -19,7 +26,11 @@ const signUp = async (req, res, next) => {
       // delete user.email;
       // delete user.isPreferenceOrRateChecked;
       //delete user.isAdmin;
-      res.locals.user = user;
+      if (created) {
+        res.locals.user = user.dataValues;
+      } else {
+        res.locals.user = user;
+      }
       next();
     })
     .catch((err) => {

@@ -141,21 +141,21 @@ const getBeerByBeerIdHandler = async (req, res, next) => {
       getBeerById(beerId, next),
       calculateRate(beerId, next),
     ]);
-    const rate = values[1].value ? values[1].value.avg : "별점없음";
+    const rate = values[1].value ? Number(values[1].value.avg) : 0;
     if (userId) {
       const like = await getLikedBeerByUserIdAndBeerId(userId, beerId, next);
-      const isLiked = like ? true : false;
+      const favorite = like ? true : false;
 
       return res.json({
         beer: values[0].value[0],
-        rate,
-        isLiked,
+        avg: rate,
+        favorite,
       });
     }
 
     return res.json({
       beer: values[0].value[0],
-      rate: values[1].value.avg,
+      avg: rate,
     });
   } catch (err) {
     console.log(err);
@@ -186,7 +186,6 @@ const getBeersByNameHandler = async (req, res, next) => {
     });
 
     if (userId) {
-      console.log(userId);
       const likes = await getLikedBeersByUserId(userId, next); //[ { beerId: 7 } ]
       const beerRateLikesArr = beerRateArr.map((beer) => {
         if (beer.id === likes[0].beerId) {
@@ -195,9 +194,12 @@ const getBeersByNameHandler = async (req, res, next) => {
         }
         return beer;
       });
-      return res.json(beerRateLikesArr);
+      return res.json({
+        totalResults: beerRateLikesArr.length,
+        result: beerRateLikesArr,
+      });
     }
-    return res.json(beerRateArr);
+    return res.json({ totalResults: beerRateArr.length, result: beerRateArr });
   } catch (err) {
     console.log(err);
     next(err);
@@ -236,6 +238,8 @@ const getAllBeersHandler = async (req, res, next) => {
     } else {
       const offset = (page - 1) * per_page;
       const rates = await calculateAllRates(offset, per_page, next);
+      const totalResults = 325;
+      const totalPages = Math.ceil(totalResults / per_page);
       let rateIdx = 0;
       const beerRateArr = beers.map((beer) => {
         if (beer.id === rates[rateIdx].beerId) {
@@ -253,9 +257,19 @@ const getAllBeersHandler = async (req, res, next) => {
           }
           return beer;
         });
-        return res.json(beerRateLikesArr);
+        return res.json({
+          page,
+          totalPages,
+          totalResults,
+          result: beerRateLikesArr,
+        });
       }
-      return res.json(beerRateArr);
+      return res.json({
+        page,
+        totalPages,
+        totalResults,
+        result: beerRateArr,
+      });
     }
   } catch (err) {
     console.log(err);
@@ -396,7 +410,7 @@ const ratedBeerHandler = async (req, res, next) => {
     if (beerRate) {
       return res.json({
         isBeerRated: true,
-        rate: beerRate.rate,
+        avg: beerRate.rate,
       });
     }
     return res.json({

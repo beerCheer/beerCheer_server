@@ -2,8 +2,8 @@ const { Op } = require("sequelize");
 const models = require("../../models/index");
 
 const signUp = async (req, res, next) => {
-  console.log(res.locals.naver);
-  const { nickname, email } = res.locals.naver.response;
+  console.log(res.locals.naver, "signup");
+  const { nickname, email } = res.locals.naver;
   //const { nickname, email } = req.body;
   models.User.findOrCreate({
     where: {

@@ -13,6 +13,7 @@ const recommendationRouter = require("./api/recommend");
 const signUp = require("./api/middlewares/signUp");
 const OAuthHandler = require("./api/middlewares/OAuthHandler");
 const isLoggedIn = require("./api/middlewares/isLoggedIn");
+//const naverLogin = require("./api/middlewares/naverLogin");
 
 require("dotenv").config();
 
@@ -30,7 +31,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.post("/oauth", signUp, OAuthHandler);
+//app.post("/naver", naverLogin, signUp, OAuthHandler);
+//app.post("/kakao", signUp, OAuthHandler);
 app.use("/users", isLoggedIn, userRouter);
 app.use("/beers", beerRouter);
 app.use("/admin", isLoggedIn, adminRouter);

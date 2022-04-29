@@ -340,7 +340,7 @@ const getAllCommentsByBeerId = async (req, res, next) => {
       raw: true,
     });
     const totalPages = Math.ceil(count / limit);
-    return res.json({ page, totalResults: count, totalPages, rows });
+    return res.json({ page, totalResults: count, totalPages, result: rows });
   } catch (err) {
     console.log(err);
     next(err);

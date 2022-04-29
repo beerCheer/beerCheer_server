@@ -241,13 +241,15 @@ const getAllBeersHandler = async (req, res, next) => {
       const totalResults = 325;
       const totalPages = Math.ceil(totalResults / per_page);
       let rateIdx = 0;
+
       const beerRateArr = beers.map((beer) => {
-        if (beer.id === rates[rateIdx].beerId) {
+        if (rates.length && beer.id === rates[rateIdx].beerId) {
           beer.avg = Number(rates[rateIdx].avg);
           rateIdx++;
         }
         return beer;
       });
+
       if (userId) {
         const likes = await getLikedBeersByUserId(userId, next);
         const beerRateLikesArr = beerRateArr.map((beer) => {

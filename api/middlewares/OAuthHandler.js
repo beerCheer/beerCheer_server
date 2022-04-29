@@ -9,7 +9,7 @@ const OAuthHandler = async (req, res, next) => {
       .cookie("accessToken", accessToken, {
         // maxAge: 9 * 60 * 60 * 1000 + 1000 * 60 * 60,
         httpOnly: true,
-        //secure: true,
+        secure: true,
         sameSite: "none",
       })
       .json(res.locals.user)

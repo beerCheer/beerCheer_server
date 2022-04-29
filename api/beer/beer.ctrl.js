@@ -432,4 +432,7 @@ module.exports = {
   ratedBeerHandler,
   getBeersByNameHandler,
   getBeerByBeerIdHandler,
+  getLikedBeersByUserId,
+  calculateAllRates,
+  calculateRate,
 };

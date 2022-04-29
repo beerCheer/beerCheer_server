@@ -75,6 +75,7 @@ const getBeersByName = async (name, next) => {
     next(err);
   }
 };
+
 module.exports = {
   getAllBeearsByPage,
   getTwelveBeersById,

@@ -3,6 +3,7 @@ const request = require("supertest");
 const app = require("../../index");
 const models = require("../../models/index");
 const userSeed = require("../../dummyForTest/user");
+const rateSeed = require("../../dummyForTest/rates");
 
 describe("Set up Database", () => {
   beforeEach("Sync DB", (done) => {
@@ -13,6 +14,7 @@ describe("Set up Database", () => {
 
   beforeEach("Bulkinsert Data", async () => {
     await models.User.bulkCreate(userSeed);
+    await models.Rate.bulkCreate(rateSeed);
   });
 
   let accessToken;
@@ -24,6 +26,23 @@ describe("Set up Database", () => {
         accessToken = res.headers["set-cookie"];
         done();
       });
+  });
+
+  describe("getRatedBeersByUserId는", () => {
+    describe("성공시", () => {
+      it("안녕", (done) => {
+        request(app)
+          .get("/users/mypage/beers")
+          .set("Cookie", ["accessToken", accessToken])
+          .end((err, res) => {
+            if (err) {
+              console.log(err);
+            }
+            //console.log(res.body);
+            done();
+          });
+      });
+    });
   });
 
   describe("getUser는", () => {

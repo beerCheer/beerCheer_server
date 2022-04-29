@@ -40,6 +40,13 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        nickname: "test5",
+        email: "test5@test.com",
+        isPreferenceOrRateChecked: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 

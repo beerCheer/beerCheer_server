@@ -5,8 +5,8 @@ const signUp = async (req, res, next) => {
   let nickname;
   let email;
   if (req.path === "/kakao") {
-    nickname = req.body.nickname;
-    email = req.body.email;
+    nickname = res.locals.kakao.kakako_account.profile.nickname;
+    email = res.locals.kakao.kakao_account.email;
   } else {
     nickname = res.locals.naver.nickname;
     email = res.locals.naver.email;

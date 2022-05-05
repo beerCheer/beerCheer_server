@@ -17,9 +17,24 @@ describe("Set up DB", () => {
 
   describe("preferenceHandler는", () => {
     let accessToken;
-    const beerId = 9;
-    const malt = "Munich";
-    const quantity = 5.63;
+    const beers = [
+      {
+        beerId: 1,
+        malt: "munich",
+        quantity: 7,
+      },
+      {
+        beerId: 2,
+        malt: "munich",
+        quantity: 3.5,
+      },
+      {
+        beerId: 8,
+        malt: "munich",
+        quantity: 3.8,
+      },
+    ];
+
     beforeEach("login", (done) => {
       request(app)
         .post("/oauth")
@@ -34,7 +49,7 @@ describe("Set up DB", () => {
         request(app)
           .post("/preferences")
           .set("Cookie", ["accessToken", accessToken])
-          .send({ beerId, malt, quantity })
+          .send(beers)
           .expect(201)
           .end((err, res) => {
             res.body.isPreferenceOrRateChecked.should.be.true();
@@ -44,13 +59,13 @@ describe("Set up DB", () => {
     });
 
     describe("실패시", () => {
-      it("beerId, malt, 또는 quantity가 없는 경우, 400과 'beerId, malt 또는 quantity 없음'을 응답한다", (done) => {
+      it("beers가 없는 경우, 400과 'beers 없음'을 응답한다", (done) => {
         request(app)
           .post("/preferences")
           .set("Cookie", ["accessToken", accessToken])
           .expect(400)
           .end((err, res) => {
-            should.equal(res.body.message, "beerId, malt 또는 quantity 없음");
+            should.equal(res.body.message, "beers 없음");
             done();
           });
       });

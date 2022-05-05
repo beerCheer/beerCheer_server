@@ -1,16 +1,28 @@
 const models = require("../../models");
 
-const createPreference = async (req, res, next) => {
+const findHighestMalt = (beers) => {
+  const highestMalt = beers.reduce((prev, cur) => {
+    if (prev.quantity < cur.quantity) {
+      return cur;
+    } else {
+      return prev;
+    }
+  });
+  return highestMalt;
+};
+
+const createPreference = async (beer, next) => {
   //console.log("createPreference의 res.locals.id: ", res.locals.id);
+
   try {
     await models.Preference.create({
-      userId: res.locals.id,
-      beerId: req.body.beerId,
-      malt: req.body.malt,
-      quantity: req.body.quantity,
+      //userId: res.locals.id,
+      beerId: beer.beerId,
+      malt: beer.malt,
+      quantity: beer.quantity,
     });
   } catch (err) {
-    console.log("hello error", err);
+    console.log(err);
     next(err);
   }
 };
@@ -39,13 +51,14 @@ const updateIsPreferenceOrRateChecked = async (req, res, next) => {
 };
 
 const preferenceHandler = async (req, res, next) => {
-  if (!req.body.beerId || !req.body.malt || !req.body.quantity) {
+  if (!req.body.beers) {
     return res.status(400).json({
-      message: "beerId, malt 또는 quantity 없음",
+      message: "beers 없음",
     });
   }
   try {
-    await createPreference(req, res, next);
+    const highestMaltData = findHighestMalt(req.body.beers);
+    await createPreference(highestMaltData, next);
     await updateIsPreferenceOrRateChecked(req, res, next);
 
     return res.status(201).json({

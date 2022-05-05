@@ -12,7 +12,7 @@ const recommendationRouter = require("./api/recommend");
 //const commentRouter = require("./api/beer/comment");
 const signUp = require("./api/middlewares/signUp");
 const OAuthHandler = require("./api/middlewares/OAuthHandler");
-const kakaoLogin = require("./api/middlewares/naverLogin");
+const kakaoLogin = require("./api/middlewares/kakaoLogin");
 const isLoggedIn = require("./api/middlewares/isLoggedIn");
 const naverLogin = require("./api/middlewares/naverLogin");
 

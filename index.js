@@ -12,6 +12,7 @@ const recommendationRouter = require("./api/recommend");
 //const commentRouter = require("./api/beer/comment");
 const signUp = require("./api/middlewares/signUp");
 const OAuthHandler = require("./api/middlewares/OAuthHandler");
+const kakaoLogin = require("./api/middlewares/naverLogin");
 const isLoggedIn = require("./api/middlewares/isLoggedIn");
 const naverLogin = require("./api/middlewares/naverLogin");
 
@@ -39,6 +40,7 @@ app.use("/admin", isLoggedIn, adminRouter);
 app.use("/recommendations", isLoggedIn, recommendationRouter);
 //app.use("/comments", isLoggedIn, commentRouter);
 app.use("/preferences", isLoggedIn, preferenceRouter);
+//app.use("/preferences", preferenceRouter);
 app.use("/favorites", isLoggedIn, favoriteRouter);
 
 app.use((err, req, res, next) => {

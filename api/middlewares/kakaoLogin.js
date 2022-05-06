@@ -2,7 +2,7 @@ require("dotenv").config();
 const request = require("request");
 
 const kakaoLogin = async (req, res, next) => {
-  //const { code, redirectUri } = req.body;​
+  const { code, redirectUri } = req.body;
   const api_url = `https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id=${process.env.BEER_KAKAO_CLIENTID}&redirect_uri=${redirectUri}&code=${code}`;
   const options = {
     url: api_url,

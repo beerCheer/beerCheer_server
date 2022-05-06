@@ -51,7 +51,7 @@ const updateIsPreferenceOrRateChecked = async (req, res, next) => {
 };
 
 const preferenceHandler = async (req, res, next) => {
-  if (!req.body.beers) {
+  if (!req.body.beers || req.body.beers.length === 0) {
     return res.status(400).json({
       message: "beers 없음",
     });

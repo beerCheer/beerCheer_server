@@ -187,6 +187,12 @@ const getBeersByNameHandler = async (req, res, next) => {
 
     if (userId) {
       const likes = await getLikedBeersByUserId(userId, next); //[ { beerId: 7 } ]
+      if (likes.length === 0) {
+        return res.json({
+          totalResults: beerRateArr.length,
+          result: beerRateArr,
+        });
+      }
       const beerRateLikesArr = beerRateArr.map((beer) => {
         if (beer.id === likes[0].beerId) {
           beer.favorite = true;
@@ -252,6 +258,14 @@ const getAllBeersHandler = async (req, res, next) => {
 
       if (userId) {
         const likes = await getLikedBeersByUserId(userId, next);
+        if (likes.length === 0) {
+          return res.json({
+            page,
+            totalPages,
+            totalResults,
+            result: beerRateArr,
+          });
+        }
         const beerRateLikesArr = beerRateArr.map((beer) => {
           if (beer.id === likes[0].beerId) {
             beer.favorite = true;

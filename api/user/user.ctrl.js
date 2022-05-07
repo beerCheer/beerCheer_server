@@ -278,6 +278,25 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
+const updateIsPreferenceOrRateChecked = async (req, res, next) => {
+  const userId = res.locals.id;
+  const IsPreferenceOrRateChecked = await models.User.update(
+    {
+      isPreferenceOrRateChecked: true,
+    },
+    {
+      where: {
+        id: userId,
+      },
+    }
+  );
+  if (IsPreferenceOrRateChecked) {
+    return res.status(204).end();
+  }
+  return res.status(400).json({
+    message: "isPreferencerRateChecked 변경 실패",
+  });
+};
 module.exports = {
   logoutUser,
   nicknameValidationCheck,
@@ -287,4 +306,5 @@ module.exports = {
   getMypageRatedBeers,
   getMypageFavoriteBeers,
   getMypageComments,
+  updateIsPreferenceOrRateChecked,
 };

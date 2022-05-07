@@ -10,5 +10,5 @@ router.post("/userInfo", ctrl.nicknameValidationCheck);
 router.patch("/userInfo", ctrl.updateUserNickname);
 router.post("/logout", ctrl.logoutUser);
 router.delete("/", ctrl.deleteUser);
-
+router.patch("/", ctrl.updateIsPreferenceOrRateChecked);
 module.exports = router;

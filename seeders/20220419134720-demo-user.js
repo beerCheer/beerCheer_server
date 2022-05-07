@@ -47,6 +47,13 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        nickname: "test6",
+        email: "test6@test.com",
+        isPreferenceOrRateChecked: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 

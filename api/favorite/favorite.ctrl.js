@@ -9,6 +9,7 @@ const createFavoriteHandler = async (req, res, next) => {
   }
   try {
     await models.Favorite.create({
+      userId: parseInt(res.locals.id, 10),
       beerId,
     });
     return res.status(201).end();

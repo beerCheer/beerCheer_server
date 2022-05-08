@@ -7,6 +7,7 @@ const { getLikedBeersByUserId } = require("../beer/beer.ctrl");
 /*유저 마이페이지 댓글 조회*/
 const getMypageComments = async (req, res, next) => {
   try {
+    console.log("what");
     const comments = await models.Comment.findAll({
       attributes: ["beerId", "content", "createdAt"],
       where: {
@@ -27,7 +28,7 @@ const getMypageComments = async (req, res, next) => {
     let commentIdx = 0;
     beers.map((beer) => {
       if (beer.id === comments[commentIdx].beerId) {
-        comments[0].beerName = beer.name;
+        comments[commentIdx].beerName = beer.name;
         commentIdx++;
       }
       return beer;

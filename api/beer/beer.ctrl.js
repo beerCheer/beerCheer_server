@@ -136,20 +136,33 @@ const getLikedBeerByUserIdAndBeerId = async (userId, beerId, next) => {
 const getBeerByBeerIdHandler = async (req, res, next) => {
   const beerId = parseInt(req.params.beerId, 10);
   const userId = parseInt(req.query.id, 10);
+
   try {
     const values = await Promise.allSettled([
       getBeerById(beerId, next),
       calculateRate(beerId, next),
     ]);
-    const rate = values[1].value ? Number(values[1].value.avg) : 0;
+
+    const avg = values[1].value ? Number(values[1].value.avg) : 0;
+
     if (userId) {
       const like = await getLikedBeerByUserIdAndBeerId(userId, beerId, next);
-      const favorite = like ? true : false;
+      const userRate = await models.Rate.findOne({
+        attributes: ["rate"],
+        where: {
+          userId,
+          beerId,
+        },
+        raw: true,
+      });
 
+      const favorite = like ? true : false;
+      const rate = userRate ? userRate.rate : null;
       return res.json({
         beer: values[0].value[0],
-        avg: rate,
+        avg,
         favorite,
+        rate,
       });
     }
 
@@ -254,7 +267,6 @@ const getAllBeersHandler = async (req, res, next) => {
         }
         return beer;
       });
-
       if (userId) {
         const likes = await getLikedBeersByUserId(userId, next);
         if (likes.length === 0) {
@@ -266,6 +278,7 @@ const getAllBeersHandler = async (req, res, next) => {
           });
         }
         let likeIdx = 0;
+
         const beerRateLikesArr = beerRateArr.map((beer) => {
           if (likeIdx < likes.length && beer.id === likes[likeIdx].beerId) {
             beer.favorite = true;

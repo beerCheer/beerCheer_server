@@ -230,7 +230,6 @@ const getAllBeersHandler = async (req, res, next) => {
   //     message: "isPreferenceOrRateChecked 없음",
   //   });
   // }
-
   if (!page || !per_page) {
     return res.status(400).json({
       message: "page, per_page 없음",
@@ -266,10 +265,11 @@ const getAllBeersHandler = async (req, res, next) => {
             result: beerRateArr,
           });
         }
+        let likeIdx = 0;
         const beerRateLikesArr = beerRateArr.map((beer) => {
-          if (beer.id === likes[0].beerId) {
+          if (likeIdx < likes.length && beer.id === likes[likeIdx].beerId) {
             beer.favorite = true;
-            likes.shift();
+            likeIdx++;
           }
           return beer;
         });

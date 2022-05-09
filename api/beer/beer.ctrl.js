@@ -158,17 +158,16 @@ const getBeerByBeerIdHandler = async (req, res, next) => {
 
       const favorite = like ? true : false;
       const rate = userRate ? userRate.rate : null;
+      values[0].value[0].avg = avg;
+      values[0].value[0].favorite = favorite;
+      values[0].value[0].rate = rate;
       return res.json({
         beer: values[0].value[0],
-        avg,
-        favorite,
-        rate,
       });
     }
-
+    values[0].value[0].avg = avg;
     return res.json({
       beer: values[0].value[0],
-      avg,
     });
   } catch (err) {
     console.log(err);

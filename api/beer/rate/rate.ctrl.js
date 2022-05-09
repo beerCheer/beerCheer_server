@@ -1,9 +1,14 @@
 const models = require("../../../models");
 
 const createRateHandler = async (req, res, next) => {
-  if (!req.params.beerId || !req.body.rate) {
+  if (
+    !req.params.beerId ||
+    !req.body.rate ||
+    !req.body.malt ||
+    !req.body.quantity
+  ) {
     return res.json({
-      message: "beerId 또는 rate 없음",
+      message: "beerId 또는 rate, malt, quantity 없음",
     });
   }
   try {
@@ -11,6 +16,8 @@ const createRateHandler = async (req, res, next) => {
       userId: res.locals.id,
       beerId: parseInt(req.params.beerId, 10),
       rate: parseInt(req.body.rate, 10),
+      malt: req.body.malt,
+      quantity: parseInt(req.body.quantity, 10),
     });
     await models.User.update(
       {

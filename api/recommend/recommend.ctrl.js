@@ -24,7 +24,6 @@ const getRatedBeerIdsAndMaltsByUserId = async (req, res, next) => {
         [Op.gte]: 4,
       },
     },
-    group: ["beerId"],
     raw: true,
   });
   return new Promise((resolve) => {

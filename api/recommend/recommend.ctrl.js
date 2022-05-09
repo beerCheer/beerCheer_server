@@ -37,7 +37,11 @@ const recommendHandler = async (req, res, next) => {
     getPreferenceBeersMaltsByUserId(req, res, next),
     getRatedBeerIdsAndMaltsByUserId(req, res, next),
   ]);
-
+  if (!values[0].value && !values[1].value) {
+    return res.json({
+      message: "선호 맥주 또는 별점 매긴 맥주 없음",
+    });
+  }
   const findHighesttMalt = (arr) => {
     const highestMalt = arr.reduce((acc, cur) => {
       if (Number(acc.quantity) < Number(acc.cur)) {
@@ -56,10 +60,6 @@ const recommendHandler = async (req, res, next) => {
   // 유저가 4점 이상 매긴 맥주가 없는 경우 선호 맥주를 토대로 추천
   else if (!values[1].value.length) {
     highestMalt = findHighesttMalt(values[0].value);
-  } else {
-    return res.json({
-      message: "선호 맥주 또는 별점 매긴 맥주 없음",
-    });
   }
 
   const beers = await getBeersByMalt(highestMalt, next);

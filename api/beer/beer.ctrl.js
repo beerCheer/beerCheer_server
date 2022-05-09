@@ -269,6 +269,7 @@ const getAllBeersHandler = async (req, res, next) => {
       });
       if (userId) {
         const likes = await getLikedBeersByUserId(userId, next);
+
         if (likes.length === 0) {
           return res.json({
             page,
@@ -278,9 +279,20 @@ const getAllBeersHandler = async (req, res, next) => {
           });
         }
         let likeIdx = 0;
+        const firstBeerId = beers[0].id;
+        const lastBeerId = beers[per_page - 1].id;
+
+        const filteredLikes = likes.filter((like) => {
+          if (like.beerId >= firstBeerId && like.beerId <= lastBeerId) {
+            return like;
+          }
+        });
 
         const beerRateLikesArr = beerRateArr.map((beer) => {
-          if (likeIdx < likes.length && beer.id === likes[likeIdx].beerId) {
+          if (
+            likeIdx < filteredLikes.length &&
+            beer.id === filteredLikes[likeIdx].beerId
+          ) {
             beer.favorite = true;
             likeIdx++;
           }

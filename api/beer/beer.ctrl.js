@@ -205,13 +205,28 @@ const getBeersByNameHandler = async (req, res, next) => {
           result: beerRateArr,
         });
       }
+      let likeIdx = 0;
       const beerRateLikesArr = beerRateArr.map((beer) => {
-        if (beer.id === likes[0].beerId) {
+        if (likeIdx < likes.length && beer.id === likes[likeIdx].beerId) {
           beer.favorite = true;
-          likes.shift();
+          likeIdx++;
+          return beer;
+        } else if (likeIdx < likes.length && beer.id > likes[likeIdx].beerId) {
+          likeIdx++;
+          //return beer;
         }
         return beer;
       });
+      //console.log(beerRateLikesArr);
+      // likeIdx = 0;
+      // const beerRateLikesArr = beerRateArr.map((beer) => {
+      //   if (likeIdx < likes.length && beer.id === likes[likeIdx].beerId) {
+      //     beer.favorite = true;
+      //     likeIdx++;
+      //   }
+      //   return beer;
+      // });
+
       return res.json({
         totalResults: beerRateLikesArr.length,
         result: beerRateLikesArr,
@@ -324,6 +339,24 @@ const getTop12Handler = async (req, res, next) => {
       rateIdx++;
       return beer;
     });
+    if (res.locals.id) {
+      const userId = parseInt(res.locals.id, 10);
+      const likes = await getLikedBeersByUserId(userId, next);
+      if (likes.length === 0) {
+        return res.json(beerRateArr);
+      } else {
+        let likeIdx = 0;
+
+        const beerRateLikesArr = beerRateArr.map((beer) => {
+          if (likeIdx < likes.length && beer.id === likes[likeIdx].beerId) {
+            beer.favorite = true;
+            likeIdx++;
+          }
+          return beer;
+        });
+        return res.json(beerRateLikesArr);
+      }
+    }
     return res.json(beerRateArr);
   } catch (err) {
     console.log(err);

@@ -61,6 +61,9 @@ const getMypageFavoriteBeers = async (req, res, next) => {
       return beer.beerId;
     });
     const beers = await getTwelveBeersById(beerIdsArr, next);
+    for (const beer of beers) {
+      beer.favorite = true;
+    }
     const avgs = await models.Rate.findAll({
       attributes: [
         "beerId",
@@ -75,6 +78,7 @@ const getMypageFavoriteBeers = async (req, res, next) => {
       group: ["Rate.beerId"],
       raw: true,
     });
+
     if (avgs.length === 0) {
       return res.json({
         totalResults: beers.length,

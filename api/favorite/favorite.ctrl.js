@@ -20,7 +20,7 @@ const createFavoriteHandler = async (req, res, next) => {
 };
 
 const deleteFavoriteHandler = async (req, res, next) => {
-  const beerId = req.params.beerId;
+  const beerId = parseInt(req.params.beerId, 10);
   if (!beerId) {
     return res.status(400).json({
       message: "beerId 없음",
@@ -34,6 +34,7 @@ const deleteFavoriteHandler = async (req, res, next) => {
         userId: res.locals.id,
       },
     });
+    return res.status(204).end();
   } catch (err) {
     console.log(err);
     next(err);

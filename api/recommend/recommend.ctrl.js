@@ -36,7 +36,7 @@ const recommendHandler = async (req, res, next) => {
     getPreferenceBeersMaltsByUserId(req, res, next),
     getRatedBeerIdsAndMaltsByUserId(req, res, next),
   ]);
-  if (!values[0].value && !values[1].value) {
+  if (!values[0].value.length && !values[1].value.length) {
     return res.json({
       message: "선호 맥주 또는 별점 매긴 맥주 없음",
     });

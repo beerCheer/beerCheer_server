@@ -15,6 +15,7 @@ const OAuthHandler = require("./api/middlewares/OAuthHandler");
 const kakaoLogin = require("./api/middlewares/kakaoLogin");
 const isLoggedIn = require("./api/middlewares/isLoggedIn");
 const naverLogin = require("./api/middlewares/naverLogin");
+const isAdmin = require("./api/middlewares/isAdmin");
 
 require("dotenv").config();
 
@@ -37,6 +38,8 @@ app.post("/kakao", kakaoLogin, signUp, OAuthHandler);
 app.use("/users", isLoggedIn, userRouter);
 app.use("/beers", beerRouter);
 app.use("/admin", isLoggedIn, adminRouter);
+app.use("/adminCheck", isAdmin);
+
 app.use("/recommendations", isLoggedIn, recommendationRouter);
 //app.use("/comments", isLoggedIn, commentRouter);
 app.use("/preferences", isLoggedIn, preferenceRouter);
